@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eyewa · Interview Question Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,700;1,300&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --card: #1c2128;
+    --border: #30363d;
+    --accent: #3fb950;
+    --accent2: #58a6ff;
+    --accent3: #f78166;
+    --accent4: #d2a8ff;
+    --text: #e6edf3;
+    --muted: #7d8590;
+    --serif: 'Fraunces', Georgia, serif;
+    --mono: 'DM Mono', monospace;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    min-height: 100vh;
+  }
+
+  /* subtle grid bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(63,185,80,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(63,185,80,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .header {
+    position: relative;
+    z-index: 1;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .brand {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+  .brand span { color: var(--accent); }
+  .header-tag {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  .main {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  /* ── INTRO ── */
+  .intro { margin-bottom: 40px; }
+  .intro-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .intro-label::before { content: ''; width: 24px; height: 1px; background: var(--accent); }
+  .intro-title {
+    font-family: var(--serif);
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 14px;
+  }
+  .intro-title em { font-style: italic; color: var(--accent); }
+  .intro-sub { font-size: 12.5px; color: var(--muted); line-height: 1.8; max-width: 540px; }
+
+  /* ── FORM ── */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .form-card-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--card);
+  }
+  .form-card-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 11px;
+    font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .form-card-title {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .form-card-body { padding: 24px; }
+
+  .field { margin-bottom: 20px; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .field-hint { font-size: 11px; color: var(--muted); margin-bottom: 8px; opacity: 0.8; font-style: italic; }
+  .req { color: var(--accent3); margin-left: 2px; }
+
+  input[type="text"], select, textarea {
+    width: 100%;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 11px 14px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(63,185,80,0.1);
+  }
+  textarea { resize: vertical; min-height: 140px; line-height: 1.7; }
+  select option { background: var(--card); }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* CORE COMPETENCIES checkboxes */
+  .competency-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+  }
+  .comp-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    font-size: 12px;
+    color: var(--text);
+  }
+  .comp-check:hover { border-color: var(--accent); }
+  .comp-check input { accent-color: var(--accent); flex-shrink: 0; }
+  .comp-check.checked { border-color: var(--accent); background: rgba(63,185,80,0.06); }
+
+  /* STAGES toggle */
+  .stages-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .stage-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.2s;
+  }
+  .stage-toggle:hover { border-color: var(--accent2); }
+  .stage-toggle input { accent-color: var(--accent2); }
+  .stage-toggle.checked { border-color: var(--accent2); background: rgba(88,166,255,0.06); color: var(--accent2); }
+
+  /* GENERATE BUTTON */
+  .generate-wrap {
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .btn-generate {
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 14px 36px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-generate:hover { background: #2ea043; transform: translateY(-1px); }
+  .btn-generate:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; transform: none; }
+  .generate-note { font-size: 11px; color: var(--muted); line-height: 1.6; }
+
+  /* ── LOADING ── */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(13,17,23,0.92);
+    z-index: 100;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+  .loading-overlay.visible { display: flex; }
+  .loading-title { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--text); }
+  .loading-sub { font-size: 12px; color: var(--muted); letter-spacing: 0.05em; text-align: center; max-width: 340px; line-height: 1.8; }
+  .loader {
+    display: flex; gap: 6px; align-items: center;
+  }
+  .loader-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
+    animation: bounce 1.2s ease infinite;
+  }
+  .loader-dot:nth-child(2) { animation-delay: 0.2s; background: var(--accent2); }
+  .loader-dot:nth-child(3) { animation-delay: 0.4s; background: var(--accent4); }
+  @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-10px)} }
+
+  /* ── OUTPUT ── */
+  #output { display: none; margin-top: 48px; animation: fadeUp 0.4s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+  .output-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .output-title {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .output-meta { font-size: 11px; color: var(--muted); line-height: 1.7; }
+  .output-actions { display: flex; gap: 10px; flex-shrink: 0; }
+  .btn-action {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 18px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .btn-print { background: var(--accent2); color: var(--bg); }
+  .btn-print:hover { background: #388bfd; }
+  .btn-copy-all { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+  .btn-copy-all:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-reset { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-reset:hover { border-color: var(--accent3); color: var(--accent3); }
+
+  /* STAGE BLOCK */
+  .stage-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .stage-block-header {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .stage-block-left { display: flex; align-items: center; gap: 12px; }
+  .stage-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .stage-name {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .stage-desc { font-size: 11px; color: var(--muted); }
+  .stage-badge {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+
+  .stage-block-body { padding: 0; }
+
+  /* COMPETENCY SECTION within stage */
+  .comp-section { border-bottom: 1px solid var(--border); }
+  .comp-section:last-child { border-bottom: none; }
+  .comp-section-header {
+    padding: 14px 24px;
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .comp-section-header:hover { background: rgba(255,255,255,0.03); }
+  .comp-tag {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+  .comp-tag-core { background: rgba(63,185,80,0.15); color: var(--accent); }
+  .comp-tag-role { background: rgba(88,166,255,0.15); color: var(--accent2); }
+  .comp-tag-culture { background: rgba(210,168,255,0.15); color: var(--accent4); }
+  .comp-name { font-size: 13px; font-weight: 500; flex: 1; }
+  .comp-toggle { font-size: 12px; color: var(--muted); transition: transform 0.2s; }
+  .comp-toggle.open { transform: rotate(180deg); }
+
+  .questions-list {
+    padding: 0 24px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .question-item {
+    padding: 14px 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    border-left: 3px solid var(--border);
+  }
+  .question-item.main-q { border-left-color: var(--accent); }
+  .question-item.probe-q { border-left-color: var(--muted); }
+  .question-item.redflag-q { border-left-color: var(--accent3); }
+
+  .question-type {
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .question-type.main { color: var(--accent); }
+  .question-type.probe { color: var(--muted); }
+  .question-type.red { color: var(--accent3); }
+
+  .question-text { font-size: 13px; line-height: 1.65; color: var(--text); }
+  .question-note { font-size: 11px; color: var(--muted); margin-top: 6px; font-style: italic; line-height: 1.5; }
+
+  /* SCORECARD */
+  .scorecard-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 28px;
+  }
+  .scorecard-header {
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .scorecard-title {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .scorecard-note { font-size: 11px; color: var(--muted); }
+
+  .scorecard-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .scorecard-table th {
+    padding: 10px 16px;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+    font-weight: 500;
+  }
+  .scorecard-table td {
+    padding: 12px 16px;
+    font-size: 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    vertical-align: top;
+  }
+  .scorecard-table tr:last-child td { border-bottom: none; }
+  .scorecard-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .score-boxes {
+    display: flex;
+    gap: 4px;
+  }
+  .score-box {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--card);
+    flex-shrink: 0;
+  }
+
+  /* ── JD IMPORTER ── */
+  .jd-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .jd-tab {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 10px 18px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: -1px;
+    border-radius: 6px 6px 0 0;
+  }
+  .jd-tab:hover { color: var(--text); background: var(--card); }
+  .jd-tab.active { background: var(--card); color: var(--accent); border-color: var(--border); border-bottom-color: var(--card); z-index: 1; }
+
+  .jd-panel {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+  }
+
+  /* Upload zone */
+  .upload-zone {
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-radius: 0 0 6px 6px;
+  }
+  .upload-zone:hover, .upload-zone.dragging { background: rgba(63,185,80,0.05); }
+  .upload-icon { font-size: 28px; margin-bottom: 4px; }
+  .upload-label { font-size: 13px; color: var(--text); font-weight: 500; }
+  .upload-sub { font-size: 11px; color: var(--muted); }
+
+  .jd-status {
+    padding: 0 16px 12px;
+    font-size: 11px;
+    min-height: 28px;
+    line-height: 1.6;
+  }
+  .jd-status.success { color: var(--accent); }
+  .jd-status.error { color: var(--accent3); }
+  .jd-status.loading { color: var(--accent2); }
+
+  /* Drive input */
+  .drive-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .drive-icon { font-size: 16px; flex-shrink: 0; }
+  .btn-fetch {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 7px 16px;
+    background: var(--accent2);
+    color: var(--bg);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .btn-fetch:hover { background: #388bfd; }
+  .drive-note {
+    padding: 10px 16px 14px;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* Preview */
+  .jd-preview {
+    background: var(--card);
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    margin-top: 8px;
+    overflow: hidden;
+  }
+  .jd-preview-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(63,185,80,0.08);
+  }
+  .jd-preview-label { font-size: 11px; color: var(--accent); font-weight: 500; flex: 1; }
+  .jd-preview-count { font-size: 10px; color: var(--muted); }
+  .jd-preview-clear {
+    font-family: var(--mono);
+    font-size: 10px;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 3px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .jd-preview-clear:hover { border-color: var(--accent3); color: var(--accent3); }
+  .jd-preview-text {
+    padding: 14px;
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.75;
+    max-height: 140px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+  }
+
+  /* ── END JD IMPORTER ── */
+    font-size: 11px;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .copy-confirm.show { opacity: 1; }
+
+  /* PRINT */
+  @media print {
+    body { background: white; color: black; font-family: Georgia, serif; }
+    body::before { display: none; }
+    .header, .intro, .form-card, .generate-wrap, .loading-overlay,
+    .output-actions, .btn-action { display: none !important; }
+    #output { display: block !important; margin-top: 0; }
+    .stage-block, .scorecard-block { break-inside: avoid; border: 1px solid #ccc; }
+    .stage-block-header { background: #f5f5f5; }
+    .comp-section-header { background: #fafafa; }
+    .question-item { border: 1px solid #ddd; }
+  }
+
+  @media (max-width: 640px) {
+    .main { padding: 28px 16px 60px; }
+    .header { padding: 14px 20px; }
+    .row-2 { grid-template-columns: 1fr; }
+    .output-header { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brand">Eyewa<span>.</span></div>
+  <div class="header-tag">Interview Question Generator</div>
+</div>
+
+<div class="main">
+
+  <div class="intro">
+    <div class="intro-label">TA Operations · Internal Tool</div>
+    <div class="intro-title">Interview <em>Pack</em><br>Generator</div>
+    <p class="intro-sub">Paste the JD, select competencies and stages — Claude generates a full set of tailored questions per stage, plus a printable scorecard. Every question maps to a competency. Nothing generic.</p>
+  </div>
+
+  <!-- CARD 1: ROLE -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <div class="form-card-num">1</div>
+      <div class="form-card-title">Role Details</div>
+    </div>
+    <div class="form-card-body">
+      <div class="row-2">
+        <div class="field">
+          <label class="field-label">Role Title <span class="req">*</span></label>
+          <input type="text" id="role-title" placeholder="e.g. Senior Buyer — Sunglasses">
+        </div>
+        <div class="field">
+          <label class="field-label">Seniority Level <span class="req">*</span></label>
+          <select id="role-level">
+            <option value="">Select level</option>
+            <option value="junior">Junior / Entry level</option>
+            <option value="mid">Mid-level</option>
+            <option value="senior">Senior</option>
+            <option value="lead">Team Lead / Manager</option>
+            <option value="senior-manager">Senior Manager / Head of</option>
+            <option value="director">Director</option>
+            <option value="vp">VP / C-Suite (Senior — include Founder stage)</option>
+          </select>
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label class="field-label">Department</label>
+          <input type="text" id="role-dept" placeholder="e.g. Commercial, Retail, Tech">
+        </div>
+        <div class="field">
+          <label class="field-label">Location</label>
+          <input type="text" id="role-location" placeholder="e.g. Dubai, UAE">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Job Description <span class="req">*</span></label>
+        <div class="field-hint">Upload from your desktop, link from Google Drive, or paste directly</div>
+
+        <!-- SOURCE TABS -->
+        <div class="jd-tabs">
+          <button class="jd-tab active" onclick="switchTab('upload', this)">⬆ Upload File</button>
+          <button class="jd-tab" onclick="switchTab('drive', this)">🔗 Google Drive Link</button>
+          <button class="jd-tab" onclick="switchTab('paste', this)">✏ Paste Text</button>
+        </div>
+
+        <!-- UPLOAD -->
+        <div class="jd-panel" id="panel-upload">
+          <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+            <div class="upload-icon">📄</div>
+            <div class="upload-label">Drop your JD here or click to browse</div>
+            <div class="upload-sub">Word (.docx), PDF, or plain text (.txt)</div>
+            <input type="file" id="file-input" accept=".docx,.pdf,.txt,.doc" style="display:none" onchange="handleFileSelect(event)">
+          </div>
+          <div class="jd-status" id="upload-status"></div>
+        </div>
+
+        <!-- GOOGLE DRIVE -->
+        <div class="jd-panel" id="panel-drive" style="display:none">
+          <div class="drive-input-wrap">
+            <span class="drive-icon">🔗</span>
+            <input type="text" id="drive-url" placeholder="Paste Google Drive or Google Doc link here..." style="border:none;background:transparent;flex:1;outline:none;font-family:var(--mono);font-size:12.5px;color:var(--text)">
+            <button class="btn-fetch" onclick="fetchDriveDoc()">Fetch →</button>
+          </div>
+          <div class="jd-status" id="drive-status"></div>
+          <div class="drive-note">⚠ The Google Doc must be set to <strong>"Anyone with the link can view"</strong> for this to work</div>
+        </div>
+
+        <!-- PASTE -->
+        <div class="jd-panel" id="panel-paste" style="display:none">
+          <textarea id="jd-paste" placeholder="Paste the full job description here..." style="min-height:160px;border-radius:0 0 6px 6px;border-top:none"></textarea>
+        </div>
+
+        <!-- PREVIEW -->
+        <div class="jd-preview" id="jd-preview" style="display:none">
+          <div class="jd-preview-header">
+            <span class="jd-preview-label">✓ JD loaded</span>
+            <span class="jd-preview-count" id="jd-char-count"></span>
+            <button class="jd-preview-clear" onclick="clearJD()">✕ Clear</button>
+          </div>
+          <div class="jd-preview-text" id="jd-preview-text"></div>
+        </div>
+
+        <!-- hidden store -->
+        <textarea id="jd" style="display:none"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2: COMPETENCIES -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <div class="form-card-num">2</div>
+      <div class="form-card-title">Competencies to Assess</div>
+    </div>
+    <div class="form-card-body">
+      <div class="field">
+        <label class="field-label">Core Eyewa Competencies <span class="field-hint" style="display:inline;font-size:10px">(select all that apply)</span></label>
+        <div class="field-hint">These appear across all roles</div>
+        <div class="competency-grid" id="core-comps">
+          <label class="comp-check"><input type="checkbox" value="Customer Obsession" checked onchange="toggleCheck(this)"> Customer Obsession</label>
+          <label class="comp-check"><input type="checkbox" value="Ownership & Accountability" checked onchange="toggleCheck(this)"> Ownership & Accountability</label>
+          <label class="comp-check"><input type="checkbox" value="Collaboration" checked onchange="toggleCheck(this)"> Collaboration</label>
+          <label class="comp-check"><input type="checkbox" value="Growth Mindset" checked onchange="toggleCheck(this)"> Growth Mindset</label>
+          <label class="comp-check"><input type="checkbox" value="Speed & Decisiveness" onchange="toggleCheck(this)"> Speed & Decisiveness</label>
+          <label class="comp-check"><input type="checkbox" value="Communication" onchange="toggleCheck(this)"> Communication</label>
+          <label class="comp-check"><input type="checkbox" value="Resilience" onchange="toggleCheck(this)"> Resilience</label>
+          <label class="comp-check"><input type="checkbox" value="Integrity" onchange="toggleCheck(this)"> Integrity</label>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:20px">
+        <label class="field-label">Role-Specific Competencies</label>
+        <div class="field-hint">Add competencies unique to this role — Claude will also suggest additional ones based on the JD</div>
+        <textarea id="role-comps" style="min-height:80px" placeholder="e.g. Commercial acumen, Data analysis, Vendor negotiation, People management, Technical architecture..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 3: INTERVIEW STAGES -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <div class="form-card-num">3</div>
+      <div class="form-card-title">Interview Stages</div>
+    </div>
+    <div class="form-card-body">
+      <div class="field">
+        <label class="field-label">Select stages for this role <span class="req">*</span></label>
+        <div class="field-hint">Questions will be generated specifically for each stage selected</div>
+        <div class="stages-grid" id="stages">
+          <label class="stage-toggle checked"><input type="checkbox" value="Recruiter Screen" checked onchange="toggleStage(this)"> 📞 Recruiter Screen</label>
+          <label class="stage-toggle checked"><input type="checkbox" value="Hiring Manager Interview" checked onchange="toggleStage(this)"> 👤 HM Interview</label>
+          <label class="stage-toggle"><input type="checkbox" value="Task / Case Study" onchange="toggleStage(this)"> 📋 Task / Case Study</label>
+          <label class="stage-toggle"><input type="checkbox" value="Panel Interview" onchange="toggleStage(this)"> 👥 Panel Interview</label>
+          <label class="stage-toggle"><input type="checkbox" value="CXO Interview" onchange="toggleStage(this)"> 🏢 CXO Interview</label>
+          <label class="stage-toggle"><input type="checkbox" value="Founder Interview" onchange="toggleStage(this)"> 🌟 Founder Interview</label>
+        </div>
+      </div>
+      <div class="field" style="margin-top:16px">
+        <label class="field-label">Additional context for interviewers</label>
+        <div class="field-hint">Anything specific about this hire — e.g. key concerns, things to probe, team dynamics</div>
+        <textarea id="extra-context" style="min-height:80px" placeholder="e.g. Previous candidate fell down on stakeholder management. We need to probe this hard. The team is very data-driven — assess comfort with numbers."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="generate-wrap">
+    <button class="btn-generate" onclick="generate()">Generate Interview Pack →</button>
+    <p class="generate-note">Takes ~15–20 seconds.<br>Generates questions + scorecard for all selected stages.</p>
+  </div>
+
+  <!-- OUTPUT -->
+  <div id="output">
+    <div class="output-header">
+      <div>
+        <div class="output-title" id="output-title">Interview Pack</div>
+        <div class="output-meta" id="output-meta"></div>
+      </div>
+      <div class="output-actions">
+        <button class="btn-action btn-print" onclick="window.print()">🖨 Print / PDF</button>
+        <button class="btn-action btn-copy-all" onclick="copyAll()">Copy All</button>
+        <button class="btn-action btn-reset" onclick="resetTool()">Start Over</button>
+        <span class="copy-confirm" id="copy-confirm">✓ Copied</span>
+      </div>
+    </div>
+
+    <div id="stages-output"></div>
+
+    <div class="scorecard-block" id="scorecard-block">
+      <div class="scorecard-header">
+        <div>
+          <div class="scorecard-title">Interview Scorecard</div>
+          <div class="scorecard-note">Print and use during / after each interview stage</div>
+        </div>
+      </div>
+      <table class="scorecard-table">
+        <thead>
+          <tr>
+            <th style="width:28%">Competency</th>
+            <th style="width:12%">Type</th>
+            <th style="width:24%">What "Great" Looks Like</th>
+            <th style="width:20%">Score (1–5)</th>
+            <th style="width:16%">Notes</th>
+          </tr>
+        </thead>
+        <tbody id="scorecard-body"></tbody>
+      </table>
+      <div style="padding:16px 24px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Overall Recommendation</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="padding:8px 16px;border:1px solid var(--border);border-radius:5px;font-size:12px;color:var(--accent)">☐ Strong Hire</div>
+            <div style="padding:8px 16px;border:1px solid var(--border);border-radius:5px;font-size:12px;color:var(--accent2)">☐ Hire</div>
+            <div style="padding:8px 16px;border:1px solid var(--border);border-radius:5px;font-size:12px;color:var(--muted)">☐ No Hire</div>
+            <div style="padding:8px 16px;border:1px solid var(--border);border-radius:5px;font-size:12px;color:var(--accent3)">☐ Strong No Hire</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Interviewer & Date</div>
+          <div style="height:36px;border-bottom:1px solid var(--border);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- LOADING -->
+<div class="loading-overlay" id="loading">
+  <div class="loader">
+    <div class="loader-dot"></div>
+    <div class="loader-dot"></div>
+    <div class="loader-dot"></div>
+  </div>
+  <div class="loading-title">Building your interview pack</div>
+  <div class="loading-sub">Analysing the JD, mapping competencies to stages, and writing tailored questions. Takes about 20 seconds.</div>
+</div>
+
+<script>
+  // ── JD IMPORTER ──
+
+  const PROXY_URL = 'https://api.anthropic.com/v1/messages';
+
+  function switchTab(tab, btn) {
+    document.querySelectorAll('.jd-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.jd-panel').forEach(p => p.style.display = 'none');
+    document.getElementById(`panel-${tab}`).style.display = 'block';
+    // If switching to paste and we have content, show it
+    if (tab === 'paste') {
+      const current = document.getElementById('jd').value;
+      if (current) document.getElementById('jd-paste').value = current;
+      document.getElementById('jd-paste').oninput = () => setJD(document.getElementById('jd-paste').value, 'Pasted text');
+    }
+  }
+
+  function setJD(text, source) {
+    if (!text || text.trim().length < 50) return;
+    document.getElementById('jd').value = text;
+    document.getElementById('jd-preview').style.display = 'block';
+    document.getElementById('jd-preview-text').textContent = text.slice(0, 600) + (text.length > 600 ? '...' : '');
+    document.getElementById('jd-char-count').textContent = `${text.length.toLocaleString()} characters · ${source}`;
+  }
+
+  function clearJD() {
+    document.getElementById('jd').value = '';
+    document.getElementById('jd-preview').style.display = 'none';
+    document.getElementById('upload-status').textContent = '';
+    document.getElementById('drive-status').textContent = '';
+    document.getElementById('jd-paste').value = '';
+    document.getElementById('upload-zone').innerHTML = `
+      <div class="upload-icon">📄</div>
+      <div class="upload-label">Drop your JD here or click to browse</div>
+      <div class="upload-sub">Word (.docx), PDF, or plain text (.txt)</div>
+      <input type="file" id="file-input" accept=".docx,.pdf,.txt,.doc" style="display:none" onchange="handleFileSelect(event)">
+    `;
+  }
+
+  // ── FILE UPLOAD ──
+  function handleDragOver(e) {
+    e.preventDefault();
+    document.getElementById('upload-zone').classList.add('dragging');
+  }
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('upload-zone').classList.remove('dragging');
+    const file = e.dataTransfer.files[0];
+    if (file) processFile(file);
+  }
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) processFile(file);
+  }
+
+  function processFile(file) {
+    const status = document.getElementById('upload-status');
+    const ext = file.name.split('.').pop().toLowerCase();
+
+    status.className = 'jd-status loading';
+    status.textContent = `Reading ${file.name}...`;
+
+    if (ext === 'txt') {
+      const reader = new FileReader();
+      reader.onload = e => {
+        setJD(e.target.result, file.name);
+        status.className = 'jd-status success';
+        status.textContent = `✓ ${file.name} loaded successfully`;
+      };
+      reader.readAsText(file);
+
+    } else if (ext === 'pdf') {
+      // Use PDF.js CDN to extract text
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      script.onload = async () => {
+        try {
+          const pdfjsLib = window['pdfjs-dist/build/pdf'];
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          let fullText = '';
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            fullText += content.items.map(s => s.str).join(' ') + '\n';
+          }
+          setJD(fullText, file.name);
+          status.className = 'jd-status success';
+          status.textContent = `✓ ${file.name} loaded — ${pdf.numPages} page${pdf.numPages > 1 ? 's' : ''} extracted`;
+        } catch (err) {
+          status.className = 'jd-status error';
+          status.textContent = `✕ Couldn't read PDF — try copy-pasting the text instead`;
+        }
+      };
+      document.head.appendChild(script);
+
+    } else if (ext === 'docx' || ext === 'doc') {
+      // Use mammoth.js CDN to extract text from Word docs
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js';
+      script.onload = async () => {
+        try {
+          const arrayBuffer = await file.arrayBuffer();
+          const result = await mammoth.extractRawText({ arrayBuffer });
+          setJD(result.value, file.name);
+          status.className = 'jd-status success';
+          status.textContent = `✓ ${file.name} loaded successfully`;
+        } catch (err) {
+          status.className = 'jd-status error';
+          status.textContent = `✕ Couldn't read Word file — try saving as .txt and uploading that`;
+        }
+      };
+      document.head.appendChild(script);
+
+    } else {
+      status.className = 'jd-status error';
+      status.textContent = '✕ Unsupported file type. Use .docx, .pdf, or .txt';
+    }
+  }
+
+  // ── GOOGLE DRIVE FETCH ──
+  async function fetchDriveDoc() {
+    const url = document.getElementById('drive-url').value.trim();
+    const status = document.getElementById('drive-status');
+
+    if (!url) { status.className = 'jd-status error'; status.textContent = '✕ Paste a Google Drive link first'; return; }
+
+    // Extract file ID from various Google Drive URL formats
+    let fileId = null;
+    const patterns = [
+      /\/document\/d\/([a-zA-Z0-9_-]+)/,
+      /\/file\/d\/([a-zA-Z0-9_-]+)/,
+      /id=([a-zA-Z0-9_-]+)/,
+    ];
+    for (const p of patterns) {
+      const m = url.match(p);
+      if (m) { fileId = m[1]; break; }
+    }
+
+    if (!fileId) {
+      status.className = 'jd-status error';
+      status.textContent = '✕ Couldn\'t read that link — make sure it\'s a Google Doc or Drive file URL';
+      return;
+    }
+
+    status.className = 'jd-status loading';
+    status.textContent = 'Fetching document...';
+
+    // Export Google Doc as plain text (works if "anyone with link can view")
+    const exportUrl = `https://docs.google.com/document/d/${fileId}/export?format=txt`;
+
+    try {
+      const response = await fetch(exportUrl);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const text = await response.text();
+      if (text.length < 30) throw new Error('Document appears empty or access denied');
+      setJD(text, 'Google Doc');
+      status.className = 'jd-status success';
+      status.textContent = '✓ Google Doc fetched successfully';
+    } catch (err) {
+      status.className = 'jd-status error';
+      status.textContent = '✕ Couldn\'t fetch — ensure the doc is set to "Anyone with the link can view" and try again';
+    }
+  }
+
+  // ── END JD IMPORTER ──
+
+  function toggleCheck(el) {
+    el.closest('.comp-check').classList.toggle('checked', el.checked);
+  }
+  function toggleStage(el) {
+    el.closest('.stage-toggle').classList.toggle('checked', el.checked);
+  }
+
+  function getSelectedComps() {
+    return [...document.querySelectorAll('#core-comps input:checked')].map(i => i.value);
+  }
+  function getSelectedStages() {
+    return [...document.querySelectorAll('#stages input:checked')].map(i => i.value);
+  }
+
+  // Stage colours
+  const stageColors = {
+    'Recruiter Screen': { dot: '#3fb950', badge: 'rgba(63,185,80,0.15)', badgeText: '#3fb950' },
+    'Hiring Manager Interview': { dot: '#58a6ff', badge: 'rgba(88,166,255,0.15)', badgeText: '#58a6ff' },
+    'Task / Case Study': { dot: '#d2a8ff', badge: 'rgba(210,168,255,0.15)', badgeText: '#d2a8ff' },
+    'Panel Interview': { dot: '#ffa657', badge: 'rgba(255,166,87,0.15)', badgeText: '#ffa657' },
+    'CXO Interview': { dot: '#f78166', badge: 'rgba(247,129,102,0.15)', badgeText: '#f78166' },
+    'Founder Interview': { dot: '#e3b341', badge: 'rgba(227,179,65,0.15)', badgeText: '#e3b341' },
+  };
+  const stageFocus = {
+    'Recruiter Screen': 'Motivation, logistics, career narrative, basic role fit',
+    'Hiring Manager Interview': 'Competency depth, past experience, team fit, role specifics',
+    'Task / Case Study': 'Practical skills, thinking process, output quality',
+    'Panel Interview': 'Cross-functional collaboration, communication, consistency across panel',
+    'CXO Interview': 'Strategic thinking, leadership, business impact, vision alignment',
+    'Founder Interview': 'Mission alignment, culture add, ambition, long-term potential',
+  };
+
+  async function generate() {
+    // If on paste tab, sync textarea to hidden field
+    const pasteVal = document.getElementById('jd-paste').value.trim();
+    if (pasteVal) setJD(pasteVal, 'Pasted text');
+
+    const roleTitle = document.getElementById('role-title').value.trim();
+    const roleLevel = document.getElementById('role-level').value;
+    const jd = document.getElementById('jd').value.trim();
+    const selectedStages = getSelectedStages();
+    const selectedComps = getSelectedComps();
+
+    if (!roleTitle || !roleLevel || !jd) {
+      alert('Please fill in role title, level and paste the JD before generating.');
+      return;
+    }
+    if (selectedStages.length === 0) {
+      alert('Please select at least one interview stage.');
+      return;
+    }
+
+    document.getElementById('loading').classList.add('visible');
+
+    const roleComps = document.getElementById('role-comps').value.trim();
+    const extraContext = document.getElementById('extra-context').value.trim();
+    const dept = document.getElementById('role-dept').value.trim();
+
+    const prompt = `You are an expert talent acquisition specialist at Eyewa, a fast-growing GCC eyewear retailer. Generate a complete, tailored interview question pack for the role below.
+
+ROLE: ${roleTitle}
+LEVEL: ${roleLevel}
+DEPARTMENT: ${dept || 'Not specified'}
+JD: ${jd}
+
+CORE COMPETENCIES TO ASSESS: ${selectedComps.join(', ')}
+ROLE-SPECIFIC COMPETENCIES: ${roleComps || 'Derive from the JD'}
+EXTRA CONTEXT: ${extraContext || 'None'}
+INTERVIEW STAGES: ${selectedStages.join(', ')}
+
+---
+
+Generate a JSON response (and nothing else — no markdown, no explanation, just valid JSON) in this exact structure:
+
+{
+  "suggestedRoleComps": ["comp1", "comp2", "comp3"],
+  "stages": [
+    {
+      "stage": "Stage Name",
+      "duration": "e.g. 30 minutes",
+      "purpose": "One sentence on what this stage is assessing",
+      "sections": [
+        {
+          "competency": "Competency Name",
+          "type": "core|role|culture",
+          "whatGreatLooksLike": "2-3 sentences describing an excellent answer",
+          "questions": [
+            {
+              "type": "main",
+              "question": "The main competency question",
+              "note": "Optional interviewer tip"
+            },
+            {
+              "type": "probe",
+              "question": "A follow-up probing question",
+              "note": ""
+            },
+            {
+              "type": "redflag",
+              "question": "A red flag to watch for or a challenge question",
+              "note": "What a weak answer looks like"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+Rules:
+- Generate questions ONLY for the stages listed: ${selectedStages.join(', ')}
+- Recruiter Screen: 3-4 competencies, lighter questions, motivation and fit focus
+- HM Interview: 4-5 competencies, deep behavioural STAR questions
+- Task/Case: frame as a brief or scenario relevant to the role
+- Panel: cross-functional and communication focus
+- CXO Interview: strategic, leadership, business impact focus — 3-4 competencies
+- Founder Interview: mission/culture/ambition focus — 3 competencies max, big-picture questions
+- All main questions should be behavioural (Tell me about a time...) or situational (Imagine you...)
+- Make questions SPECIFIC to the JD content — reference the actual role context
+- whatGreatLooksLike should be concrete and assessable
+- Return ONLY valid JSON. No markdown fences.`;
+
+    try {
+      const response = await fetch(PROXY_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': '',
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 4000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      const data = await response.json();
+      console.log('API response:', data);
+      if (data.error) throw new Error(data.error.message);
+
+      let text = data.content.map(b => b.text || '').join('');
+      // Strip markdown fences if present
+      text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+      const parsed = JSON.parse(text);
+      renderOutput(parsed, roleTitle, roleLevel, selectedStages, selectedComps);
+
+    } catch (err) {
+      document.getElementById('loading').classList.remove('visible');
+      console.error(err);
+      alert('Error generating pack: ' + err.message + '\n\nCheck the browser console for details.');
+    }
+  }
+
+  function renderOutput(data, roleTitle, roleLevel, stages, coreComps) {
+    document.getElementById('loading').classList.remove('visible');
+
+    // Header
+    document.getElementById('output-title').textContent = roleTitle + ' — Interview Pack';
+    document.getElementById('output-meta').innerHTML =
+      `${roleLevel} · ${stages.length} stage${stages.length > 1 ? 's' : ''} · ` +
+      `${data.stages.reduce((a, s) => a + s.sections.length, 0)} competencies assessed`;
+
+    // Stages
+    const stagesOut = document.getElementById('stages-output');
+    stagesOut.innerHTML = '';
+
+    data.stages.forEach(stage => {
+      const col = stageColors[stage.stage] || { dot: '#7d8590', badge: 'rgba(125,133,144,0.15)', badgeText: '#7d8590' };
+      const focus = stageFocus[stage.stage] || '';
+
+      const block = document.createElement('div');
+      block.className = 'stage-block';
+      block.innerHTML = `
+        <div class="stage-block-header">
+          <div class="stage-block-left">
+            <div class="stage-dot" style="background:${col.dot}"></div>
+            <div>
+              <div class="stage-name">${stage.stage}</div>
+              <div class="stage-desc">${stage.purpose}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div class="stage-badge" style="background:${col.badge};color:${col.badgeText}">${stage.duration}</div>
+            <div class="stage-badge" style="background:rgba(125,133,144,0.1);color:var(--muted)">${stage.sections.length} competencies</div>
+          </div>
+        </div>
+        <div class="stage-block-body" id="stage-body-${stage.stage.replace(/\s+/g,'-')}"></div>
+      `;
+      stagesOut.appendChild(block);
+
+      const body = block.querySelector(`#stage-body-${stage.stage.replace(/\s+/g,'-')}`);
+      stage.sections.forEach((section, idx) => {
+        const tagClass = section.type === 'core' ? 'comp-tag-core' : section.type === 'role' ? 'comp-tag-role' : 'comp-tag-culture';
+        const tagLabel = section.type === 'core' ? 'Core' : section.type === 'role' ? 'Role-specific' : 'Culture';
+
+        const secEl = document.createElement('div');
+        secEl.className = 'comp-section';
+        secEl.innerHTML = `
+          <div class="comp-section-header" onclick="toggleSection(this)">
+            <span class="comp-tag ${tagClass}">${tagLabel}</span>
+            <span class="comp-name">${section.competency}</span>
+            <span class="comp-toggle open">▾</span>
+          </div>
+          <div class="questions-list" id="ql-${idx}-${stage.stage.replace(/\s+/g,'-')}">
+            ${section.questions.map(q => `
+              <div class="question-item ${q.type === 'main' ? 'main-q' : q.type === 'probe' ? 'probe-q' : 'redflag-q'}">
+                <div class="question-type ${q.type === 'main' ? 'main' : q.type === 'probe' ? 'probe' : 'red'}">
+                  ${q.type === 'main' ? '● Main Question' : q.type === 'probe' ? '◦ Probing Follow-up' : '⚠ Red Flag / Challenge'}
+                </div>
+                <div class="question-text">${q.question}</div>
+                ${q.note ? `<div class="question-note">💡 ${q.note}</div>` : ''}
+              </div>
+            `).join('')}
+          </div>
+        `;
+        body.appendChild(secEl);
+      });
+    });
+
+    // Scorecard — collect all unique competencies across all stages
+    const allComps = new Map();
+    data.stages.forEach(stage => {
+      stage.sections.forEach(section => {
+        if (!allComps.has(section.competency)) {
+          allComps.set(section.competency, {
+            type: section.type,
+            whatGreat: section.whatGreatLooksLike,
+          });
+        }
+      });
+    });
+
+    const tbody = document.getElementById('scorecard-body');
+    tbody.innerHTML = '';
+    allComps.forEach((val, comp) => {
+      const tagClass = val.type === 'core' ? 'comp-tag-core' : val.type === 'role' ? 'comp-tag-role' : 'comp-tag-culture';
+      const tagLabel = val.type === 'core' ? 'Core' : val.type === 'role' ? 'Role' : 'Culture';
+      tbody.innerHTML += `
+        <tr>
+          <td style="font-weight:500">${comp}</td>
+          <td><span class="comp-tag ${tagClass}" style="font-size:9px">${tagLabel}</span></td>
+          <td style="font-size:11px;color:var(--muted);line-height:1.6">${val.whatGreat}</td>
+          <td>
+            <div class="score-boxes">
+              ${[1,2,3,4,5].map(n => `<div class="score-box">${n}</div>`).join('')}
+            </div>
+          </td>
+          <td style="font-size:11px;color:var(--muted)">___________</td>
+        </tr>
+      `;
+    });
+
+    document.getElementById('output').style.display = 'block';
+    document.getElementById('output').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function toggleSection(header) {
+    const toggle = header.querySelector('.comp-toggle');
+    const list = header.nextElementSibling;
+    const isOpen = toggle.classList.contains('open');
+    toggle.classList.toggle('open', !isOpen);
+    list.style.display = isOpen ? 'none' : 'flex';
+  }
+
+  function copyAll() {
+    const text = document.getElementById('output').innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const el = document.getElementById('copy-confirm');
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2500);
+    });
+  }
+
+  function resetTool() {
+    document.getElementById('output').style.display = 'none';
+    document.getElementById('stages-output').innerHTML = '';
+    document.getElementById('scorecard-body').innerHTML = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Pre-check core competencies
+  document.querySelectorAll('#core-comps input:checked').forEach(el => {
+    el.closest('.comp-check').classList.add('checked');
+  });
+  document.querySelectorAll('#stages input:checked').forEach(el => {
+    el.closest('.stage-toggle').classList.add('checked');
+  });
+</script>
+</body>
+</html>
